@@ -1,11 +1,10 @@
+'use client'
+import { useState, useEffect, useRef } from 'react'
+import type React from 'react'
 
-"use client"
-import { useState, useEffect, useRef } from "react"
-import type React from "react"
-
-import { saveChats, loadChats } from "../utils/storage"
-import { useTheme } from "../context/theme-context"
-import type { Chat, ChatMessage } from "../type"
+import { saveChats, loadChats } from '../utils/storage'
+import { useTheme } from '../context/theme-context'
+import type { Chat, ChatMessage } from '../type'
 
 import {
   ChatSidebar,
@@ -13,12 +12,12 @@ import {
   MessageList,
   MessageInput,
   WelcomeScreen,
-} from "../components"
+} from '../components'
 
 export default function Home() {
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const chatEndRef = useRef<HTMLDivElement | null>(null)
   const { theme, toggleTheme } = useTheme()
@@ -36,7 +35,7 @@ export default function Home() {
   }, [chats])
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chats, loading])
 
   const activeChat = chats.find((c) => c.id === activeChatId)
@@ -44,30 +43,43 @@ export default function Home() {
   const sendMessage = async () => {
     if (!input.trim() || !activeChat) return
 
-    const updatedMessages = [...activeChat.messages, { role: "User" as const, text: input }]
+    const updatedMessages = [
+      ...activeChat.messages,
+      { role: 'User' as const, text: input },
+    ]
 
     let updatedChatTitle = activeChat.title
     if (activeChat.messages.length === 0) {
-      updatedChatTitle = input.length > 30 ? input.slice(0, 30) + "..." : input
+      updatedChatTitle = input.length > 30 ? input.slice(0, 30) + '...' : input
     }
 
     updateChat(activeChat.id, updatedMessages, updatedChatTitle)
-    setInput("")
+    setInput('')
     setLoading(true)
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input, history: activeChat.messages }),
       })
       const data = await res.json()
-      updateChat(activeChat.id, [...updatedMessages, { role: "Bot" as const, text: data.reply }], updatedChatTitle)
+      updateChat(
+        activeChat.id,
+        [...updatedMessages, { role: 'Bot' as const, text: data.reply }],
+        updatedChatTitle
+      )
     } catch (error) {
       updateChat(
         activeChat.id,
-        [...updatedMessages, { role: "Bot" as const, text: "Sorry, I encountered an error. Please try again." }],
-        updatedChatTitle,
+        [
+          ...updatedMessages,
+          {
+            role: 'Bot' as const,
+            text: 'Sorry, I encountered an error. Please try again.',
+          },
+        ],
+        updatedChatTitle
       )
     }
 
@@ -75,13 +87,19 @@ export default function Home() {
   }
 
   const updateChat = (id: string, messages: ChatMessage[], title?: string) => {
-    setChats((prev) => prev.map((chat) => (chat.id === id ? { ...chat, messages, title: title ?? chat.title } : chat)))
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === id
+          ? { ...chat, messages, title: title ?? chat.title }
+          : chat
+      )
+    )
   }
 
   const createNewChat = () => {
     const newChat: Chat = {
       id: Date.now().toString(),
-      title: "New Chat",
+      title: 'New Chat',
       messages: [],
     }
     setChats([newChat, ...chats])
@@ -102,17 +120,14 @@ export default function Home() {
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage()
     }
   }
 
   return (
-    <div
-      className={`flex h-screen transition-colors duration-200 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
-        }`}
-    >
+    <div className="flex h-screen bg-background">
       <ChatSidebar
         chats={chats}
         activeChatId={activeChatId}
@@ -121,7 +136,7 @@ export default function Home() {
         onDeleteChat={deleteChat}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {activeChat ? (
           <>
             <ChatHeader chat={activeChat} />
@@ -145,5 +160,3 @@ export default function Home() {
     </div>
   )
 }
-
-

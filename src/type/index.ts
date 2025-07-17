@@ -1,11 +1,10 @@
 export interface ChatMessage {
-    role: "User" | "Bot"
-    text: string
+  role: 'User' | 'Bot'
+  text: string
 }
 
 export interface Chat {
-    id: string
-    title: string
-    messages: ChatMessage[]
+  id: string
+  title: string
+  messages: ChatMessage[]
 }
-
