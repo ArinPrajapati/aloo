@@ -1,6 +1,7 @@
 export interface ChatMessage {
   role: 'User' | 'Bot'
   text: string
+  toolOutput?: any
 }
 
 export interface Chat {

@@ -58,15 +58,27 @@ export default function Home() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input, history: activeChat.messages }),
       })
       const data = await res.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
       updateChat(
         activeChat.id,
-        [...updatedMessages, { role: 'Bot' as const, text: data.reply }],
+        [
+          ...updatedMessages,
+          {
+            role: 'Bot' as const,
+            text: data.reply,
+            toolOutput: data.toolOutput,
+          },
+        ],
         updatedChatTitle
       )
     } catch (error) {
