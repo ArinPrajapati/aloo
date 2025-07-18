@@ -1,5 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import type React from 'react'
 
 import { saveChats, loadChats } from '../utils/storage'
@@ -15,6 +17,8 @@ import {
 } from '../components'
 
 export default function Home() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [input, setInput] = useState('')
@@ -136,6 +140,26 @@ export default function Home() {
       e.preventDefault()
       sendMessage()
     }
+  }
+
+  // Handle authentication loading
+  if (status === "loading") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <div className="w-8 h-8 bg-white rounded-full"></div>
+          </div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect to login if not authenticated
+  if (status === "unauthenticated") {
+    router.push('/auth/login')
+    return null
   }
 
   return (
