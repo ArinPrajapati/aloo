@@ -1,24 +1,22 @@
-import { withAuth } from "next-auth/middleware"
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-export default withAuth(
-    function middleware(req) {
-        // Add any additional middleware logic here
-    },
-    {
-        callbacks: {
-            authorized: ({ token, req }) => {
-                // Allow access to auth pages without authentication
-                if (req.nextUrl.pathname.startsWith('/auth/')) {
-                    return true
-                }
+const isProtectedRoute = createRouteMatcher([
+  '/',
+  '/api/chat',
+  '/api/agent',
+])
 
-                // Require authentication for all other pages
-                return !!token
-            },
-        },
-    }
-)
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) {
+    await auth.protect()
+  }
+})
 
 export const config = {
-    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }

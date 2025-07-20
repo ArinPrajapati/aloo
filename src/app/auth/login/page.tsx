@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { signIn, getSession } from "next-auth/react"
+import { useSignIn } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Bot, Mail, Lock, Eye, EyeOff } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Button } from "../../../components/ui/button"
+import { Input } from "../../../components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Label } from "../../../components/ui/label"
+import { Separator } from "../../../components/ui/separator"
+import { Alert, AlertDescription } from "../../../components/ui/alert"
 
 export default function LoginPage() {
     const [email, setEmail] = useState("")
@@ -18,41 +18,45 @@ export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState("")
+    const { signIn, setActive, isLoaded } = useSignIn()
     const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (!isLoaded) return
+
         setIsLoading(true)
         setError("")
 
         try {
-            const result = await signIn("credentials", {
-                email,
+            const result = await signIn.create({
+                identifier: email,
                 password,
-                redirect: false,
             })
 
-            if (result?.error) {
-                setError("Invalid email or password")
+            if (result.status === "complete") {
+                await setActive({ session: result.createdSessionId })
+                router.push("/")
             } else {
-                // Check if session is created
-                const session = await getSession()
-                if (session) {
-                    router.push("/")
-                    router.refresh()
-                }
+                setError("Invalid email or password")
             }
-        } catch (error) {
-            setError("An error occurred. Please try again.")
+        } catch (err: any) {
+            setError(err?.errors?.[0]?.message || "An error occurred. Please try again.")
         } finally {
             setIsLoading(false)
         }
     }
 
     const handleGoogleSignIn = async () => {
+        if (!isLoaded) return
+
         setIsLoading(true)
         try {
-            await signIn("google", { callbackUrl: "/" })
+            await signIn.authenticateWithRedirect({
+                strategy: "oauth_google",
+                redirectUrl: "/sso-callback",
+                redirectUrlComplete: "/",
+            })
         } catch (error) {
             setError("Failed to sign in with Google")
             setIsLoading(false)

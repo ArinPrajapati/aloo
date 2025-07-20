@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
 
@@ -17,7 +17,7 @@ import {
 } from '../components'
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const { user, isLoaded } = useUser()
   const router = useRouter()
   const [chats, setChats] = useState<Chat[]>([])
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
@@ -25,6 +25,12 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const chatEndRef = useRef<HTMLDivElement | null>(null)
   const { theme, toggleTheme } = useTheme()
+
+  useEffect(() => {
+    if (isLoaded && !user) {
+      router.push('/auth/login')
+    }
+  }, [user, isLoaded, router])
 
   useEffect(() => {
     const storedChats = loadChats()
@@ -143,7 +149,7 @@ export default function Home() {
   }
 
   // Handle authentication loading
-  if (status === "loading") {
+  if (!isLoaded) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="text-center">
@@ -157,9 +163,8 @@ export default function Home() {
   }
 
   // Redirect to login if not authenticated
-  if (status === "unauthenticated") {
-    router.push('/auth/login')
-    return null
+  if (!user) {
+    return null // Redirect handled in useEffect
   }
 
   return (

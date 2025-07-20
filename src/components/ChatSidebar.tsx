@@ -1,6 +1,6 @@
 'use client'
 import { Sun, Moon, Plus, Trash2, MessageCircle, Bot, LogOut, User } from 'lucide-react'
-import { useSession, signOut } from 'next-auth/react'
+import { useUser, useClerk } from '@clerk/nextjs'
 import { useTheme } from '../context/theme-context'
 import type { Chat } from '../type'
 import { Button } from './ui/button'
@@ -38,10 +38,11 @@ export default function ChatSidebar({
   onDeleteChat,
 }: ChatSidebarProps) {
   const { theme, toggleTheme } = useTheme()
-  const { data: session } = useSession()
+  const { user } = useUser()
+  const { signOut } = useClerk()
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: '/auth/login' })
+    signOut({ redirectUrl: '/auth/login' })
   }
 
   return (
@@ -166,7 +167,7 @@ export default function ChatSidebar({
               </div>
             </ScrollArea>
           </div>
-          {session?.user && (
+          {user && (
             <div className="p-4 border-b border-sidebar-border justify-self-end">
               <Separator className="mb-2 text-amber-200" />
               <DropdownMenu>
@@ -175,19 +176,19 @@ export default function ChatSidebar({
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-8 w-8">
                         <AvatarImage
-                          src={session.user.image || undefined}
-                          alt={session.user.name || 'User'}
+                          src={user.imageUrl || undefined}
+                          alt={user.fullName || 'User'}
                         />
                         <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                          {session.user.name?.[0]?.toUpperCase() || 'U'}
+                          {user.fullName?.[0]?.toUpperCase() || user.firstName?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 text-left">
                         <div className="font-medium text-sm truncate">
-                          {session.user.name || 'User'}
+                          {user.fullName || user.firstName || 'User'}
                         </div>
                         <div className="text-xs text-muted-foreground truncate">
-                          {session.user.email}
+                          {user.primaryEmailAddress?.emailAddress}
                         </div>
                       </div>
                     </div>
