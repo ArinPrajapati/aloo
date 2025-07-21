@@ -1,10 +1,12 @@
 import type { Tool } from './types'
 import { getWeatherTool } from './tools/weatherTool'
 import { getGitHubTool } from './tools/githubTool'
+import { getGiphyTool } from './tools/giphyTool'
 
 export const tools: Record<string, Tool> = {
   weather: getWeatherTool(),
   github: getGitHubTool(),
+  giphy: getGiphyTool(),
 }
 
 export function getToolDescriptions(): string {

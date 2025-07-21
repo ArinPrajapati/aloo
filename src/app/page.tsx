@@ -19,13 +19,13 @@ import {
 export default function Home() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
-  const { 
-    chats, 
-    loading: chatsLoading, 
-    createChat, 
-    addMessage, 
-    updateChatTitle, 
-    deleteChat: deleteChatFromDB 
+  const {
+    chats,
+    loading: chatsLoading,
+    createChat,
+    addMessage,
+    updateChatTitle,
+    deleteChat: deleteChatFromDB
   } = useChats()
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [input, setInput] = useState('')
@@ -71,8 +71,8 @@ export default function Home() {
       const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: currentInput, 
+        body: JSON.stringify({
+          message: currentInput,
           history: [...activeChat.messages, { role: 'User', text: currentInput }]
         }),
       })

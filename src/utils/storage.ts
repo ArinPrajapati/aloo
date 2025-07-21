@@ -87,10 +87,10 @@ export async function createNewChat(userId: string, title: string): Promise<Chat
 }
 
 export async function addMessageToChat(
-  chatId: string, 
-  userId: string, 
-  role: 'User' | 'Bot', 
-  text: string, 
+  chatId: string,
+  userId: string,
+  role: 'User' | 'Bot',
+  text: string,
   toolOutput?: any
 ): Promise<void> {
   try {
