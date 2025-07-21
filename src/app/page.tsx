@@ -4,9 +4,9 @@ import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
 
-import { saveChats, loadChats } from '../utils/storage'
 import { useTheme } from '../context/theme-context'
 import type { Chat, ChatMessage } from '../type'
+import { useChats } from '../hooks/useChats'
 
 import {
   ChatSidebar,
@@ -19,7 +19,14 @@ import {
 export default function Home() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
-  const [chats, setChats] = useState<Chat[]>([])
+  const { 
+    chats, 
+    loading: chatsLoading, 
+    createChat, 
+    addMessage, 
+    updateChatTitle, 
+    deleteChat: deleteChatFromDB 
+  } = useChats()
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,16 +40,10 @@ export default function Home() {
   }, [user, isLoaded, router])
 
   useEffect(() => {
-    const storedChats = loadChats()
-    setChats(storedChats)
-    if (storedChats.length > 0) {
-      setActiveChatId(storedChats[0].id)
+    if (chats.length > 0 && !activeChatId) {
+      setActiveChatId(chats[0].id)
     }
-  }, [])
-
-  useEffect(() => {
-    saveChats(chats)
-  }, [chats])
+  }, [chats, activeChatId])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -53,17 +54,16 @@ export default function Home() {
   const sendMessage = async () => {
     if (!input.trim() || !activeChat) return
 
-    const updatedMessages = [
-      ...activeChat.messages,
-      { role: 'User' as const, text: input },
-    ]
+    // Add user message to database
+    await addMessage(activeChat.id, 'User', input)
 
-    let updatedChatTitle = activeChat.title
+    // Update chat title if this is the first message
     if (activeChat.messages.length === 0) {
-      updatedChatTitle = input.length > 30 ? input.slice(0, 30) + '...' : input
+      const newTitle = input.length > 30 ? input.slice(0, 30) + '...' : input
+      await updateChatTitle(activeChat.id, newTitle)
     }
 
-    updateChat(activeChat.id, updatedMessages, updatedChatTitle)
+    const currentInput = input
     setInput('')
     setLoading(true)
 
@@ -71,7 +71,10 @@ export default function Home() {
       const res = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, history: activeChat.messages }),
+        body: JSON.stringify({ 
+          message: currentInput, 
+          history: [...activeChat.messages, { role: 'User', text: currentInput }]
+        }),
       })
       const data = await res.json()
 
@@ -79,62 +82,30 @@ export default function Home() {
         throw new Error(data.error)
       }
 
-      updateChat(
-        activeChat.id,
-        [
-          ...updatedMessages,
-          {
-            role: 'Bot' as const,
-            text: data.reply,
-            toolOutput: data.toolOutput,
-          },
-        ],
-        updatedChatTitle
-      )
+      // Add bot response to database
+      await addMessage(activeChat.id, 'Bot', data.reply, data.toolOutput)
     } catch (error) {
-      updateChat(
-        activeChat.id,
-        [
-          ...updatedMessages,
-          {
-            role: 'Bot' as const,
-            text: 'Sorry, I encountered an error. Please try again.',
-          },
-        ],
-        updatedChatTitle
-      )
+      // Add error message to database
+      await addMessage(activeChat.id, 'Bot', 'Sorry, I encountered an error. Please try again.')
     }
 
     setLoading(false)
   }
 
-  const updateChat = (id: string, messages: ChatMessage[], title?: string) => {
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat.id === id
-          ? { ...chat, messages, title: title ?? chat.title }
-          : chat
-      )
-    )
-  }
-
-  const createNewChat = () => {
-    const newChat: Chat = {
-      id: Date.now().toString(),
-      title: 'New Chat',
-      messages: [],
+  const createNewChat = async () => {
+    const newChat = await createChat('New Chat')
+    if (newChat) {
+      setActiveChatId(newChat.id)
     }
-    setChats([newChat, ...chats])
-    setActiveChatId(newChat.id)
   }
 
-  const deleteChat = (id: string) => {
-    const updatedChats = chats.filter((chat) => chat.id !== id)
-    setChats(updatedChats)
+  const handleDeleteChat = async (id: string) => {
+    await deleteChatFromDB(id)
 
     if (activeChatId === id) {
-      if (updatedChats.length > 0) {
-        setActiveChatId(updatedChats[0].id)
+      if (chats.length > 1) {
+        const remainingChats = chats.filter(chat => chat.id !== id)
+        setActiveChatId(remainingChats[0]?.id || null)
       } else {
         setActiveChatId(null)
       }
@@ -149,7 +120,7 @@ export default function Home() {
   }
 
   // Handle authentication loading
-  if (!isLoaded) {
+  if (!isLoaded || chatsLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="text-center">
@@ -174,7 +145,7 @@ export default function Home() {
         activeChatId={activeChatId}
         onNewChat={createNewChat}
         onSelectChat={setActiveChatId}
-        onDeleteChat={deleteChat}
+        onDeleteChat={handleDeleteChat}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">

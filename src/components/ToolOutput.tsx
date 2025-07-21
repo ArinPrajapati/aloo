@@ -9,6 +9,14 @@ import {
   GitFork,
   ExternalLink,
   MapPin,
+  Users,
+  UserCheck,
+  Building2,
+  Calendar,
+  Globe,
+  Mail,
+  Book,
+  Archive,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
@@ -26,7 +34,7 @@ export default function ToolOutput({ toolOutput, toolName }: ToolOutputProps) {
     return <WeatherCard weather={toolOutput} />
   }
 
-  if (toolName === 'github' || toolOutput.repositories || toolOutput.fullName) {
+  if (toolName === 'github' || toolOutput.repositories || toolOutput.fullName || toolOutput.users || toolOutput.login) {
     return <GitHubCard data={toolOutput} />
   }
 
@@ -115,7 +123,135 @@ function WeatherCard({ weather }: { weather: any }) {
 }
 
 function GitHubCard({ data }: { data: any }) {
-  if (data.repositories) {
+  if (data.users) {
+    // User search results
+    return (
+      <Card className="mt-3 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 border-purple-200 dark:border-purple-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-purple-800 dark:text-purple-200 text-sm">
+            GitHub Users ({data.totalCount} found)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {data.users.slice(0, 5).map((user: any, index: number) => (
+            <div key={index} className="border rounded-lg p-3 bg-background/50">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.login}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <h4 className="font-medium text-sm">{user.login}</h4>
+                    <p className="text-xs text-muted-foreground">{user.type}</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
+                  <a href={user.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink size={12} />
+                  </a>
+                </Button>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
+  } else if (data.login) {
+    // Single user profile
+    return (
+      <Card className="mt-3 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50 border-purple-200 dark:border-purple-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center justify-between text-purple-800 dark:text-purple-200">
+            <div className="flex items-center gap-3">
+              <img
+                src={data.avatarUrl}
+                alt={data.login}
+                className="w-10 h-10 rounded-full"
+              />
+              <div>
+                <span className="text-sm font-medium">{data.name || data.login}</span>
+                <p className="text-xs text-purple-600 dark:text-purple-400">@{data.login}</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" className="h-6 w-6" asChild>
+              <a href={data.url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={14} />
+              </a>
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {data.bio && (
+            <p className="text-sm text-muted-foreground">{data.bio}</p>
+          )}
+
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="flex items-center gap-1">
+              <Users size={12} className="text-purple-500" />
+              <span>{data.followers} followers</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <UserCheck size={12} className="text-purple-500" />
+              <span>{data.following} following</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Book size={12} className="text-purple-500" />
+              <span>{data.publicRepos} repos</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Archive size={12} className="text-purple-500" />
+              <span>{data.publicGists} gists</span>
+            </div>
+          </div>
+
+          {(data.company || data.location || data.email || data.blog) && (
+            <div className="space-y-1 text-xs text-muted-foreground">
+              {data.company && (
+                <div className="flex items-center gap-1">
+                  <Building2 size={12} />
+                  <span>{data.company}</span>
+                </div>
+              )}
+              {data.location && (
+                <div className="flex items-center gap-1">
+                  <MapPin size={12} />
+                  <span>{data.location}</span>
+                </div>
+              )}
+              {data.email && (
+                <div className="flex items-center gap-1">
+                  <Mail size={12} />
+                  <span>{data.email}</span>
+                </div>
+              )}
+              {data.blog && (
+                <div className="flex items-center gap-1">
+                  <Globe size={12} />
+                  <a 
+                    href={data.blog.startsWith('http') ? data.blog : `https://${data.blog}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-purple-600 dark:text-purple-400 hover:underline"
+                  >
+                    {data.blog}
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+
+          {data.createdAt && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Calendar size={12} />
+              <span>Joined {new Date(data.createdAt).toLocaleDateString()}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  } else if (data.repositories) {
     // Search results
     return (
       <Card className="mt-3 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950/50 dark:to-gray-900/50 border-gray-200 dark:border-gray-800">

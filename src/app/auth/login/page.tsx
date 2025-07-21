@@ -221,6 +221,8 @@ export default function LoginPage() {
                     </div>
                 </CardContent>
             </Card>
+            {/* Clerk CAPTCHA element for bot protection */}
+            <div id="clerk-captcha" style={{ display: 'none' }}></div>
         </div>
     )
 }

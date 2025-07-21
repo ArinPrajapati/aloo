@@ -25,6 +25,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <Providers>
           <ThemeProvider>{children}</ThemeProvider>
+          {/* Global Clerk CAPTCHA element for bot protection */}
+          <div id="clerk-captcha" style={{ display: 'none' }}></div>
         </Providers>
       </body>
     </html>
