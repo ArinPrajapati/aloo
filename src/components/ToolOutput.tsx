@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { WeatherCard, GitHubCard, GiphyCard } from './tools'
+import { WeatherCard, GitHubCard, GiphyCard, WikipediaCard } from './tools'
 
 interface ToolOutputProps {
   toolOutput: any
@@ -22,6 +22,11 @@ export default function ToolOutput({ toolOutput, toolName }: ToolOutputProps) {
   // Giphy tool detection
   if (toolName === 'giphy' || toolOutput.gifs) {
     return <GiphyCard data={toolOutput} />
+  }
+
+  // Wikipedia tool detection
+  if (toolName === 'wikipedia' || toolOutput.title || toolOutput.summary || toolOutput.error) {
+    return <WikipediaCard data={toolOutput} />
   }
 
   // Generic JSON display for unknown tool outputs

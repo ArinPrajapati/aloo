@@ -29,6 +29,11 @@ ${getToolDescriptions()}
 
 Based on the user's message and conversation history, determine if any tool should be used.
 
+IMPORTANT: For Wikipedia tool, look for these patterns:
+- Questions starting with: "What is", "Who is", "Who was", "Explain", "Tell me about", "Define"
+- Educational/factual questions about: people, places, concepts, history, science, etc.
+- Examples: "What is machine learning?", "Who is Einstein?", "Tell me about Paris", "Explain quantum physics"
+
 Conversation history:
 ${history.map((h) => `${h.role}: ${h.text}`).join('\n')}
 
@@ -43,6 +48,8 @@ Respond ONLY with valid JSON in this exact format:
 Examples:
 - For weather: {"tool": "weather", "params": {"location": "London"}}
 - For GitHub: {"tool": "github", "params": {"query": "react", "type": "search"}}
+- For Wikipedia: {"tool": "wikipedia", "params": {"query": "machine learning"}}
+- For Giphy: {"tool": "giphy", "params": {"query": "funny cats", "type": "gif"}}
 - For general chat: {"tool": null, "params": {}}
 
 JSON Response:`
@@ -89,9 +96,9 @@ JSON Response:`
     const contextualHistory =
       history.length > 0
         ? `\nConversation history:\n${history
-            .slice(-5)
-            .map((h) => `${h.role}: ${h.text}`)
-            .join('\n')}\n`
+          .slice(-5)
+          .map((h) => `${h.role}: ${h.text}`)
+          .join('\n')}\n`
         : ''
 
     const finalPrompt = `
@@ -122,14 +129,13 @@ Response:`
     // Fallback to simple Gemini response
     const fallbackPrompt = `
 You are AlooChat, a helpful AI assistant.
-${
-  history.length > 0
-    ? `Conversation history:\n${history
-        .slice(-3)
-        .map((h) => `${h.role}: ${h.text}`)
-        .join('\n')}\n`
-    : ''
-}
+${history.length > 0
+        ? `Conversation history:\n${history
+          .slice(-3)
+          .map((h) => `${h.role}: ${h.text}`)
+          .join('\n')}\n`
+        : ''
+      }
 User: ${userMessage}
 
 Respond naturally and helpfully:`
