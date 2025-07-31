@@ -1,17 +1,17 @@
-import { 
-  Github, 
-  Cloud, 
-  BookOpen, 
+import {
+  Github,
+  Cloud,
+  BookOpen,
   Image,
   Activity,
   X
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
 } from './ui/tooltip'
 import { Button } from './ui/button'
 
@@ -93,7 +93,7 @@ export default function DynamicAPIStatus({ activeTools, className = '' }: Dynami
       <div className="relative">
         <Tooltip>
           <TooltipTrigger asChild>
-            <div 
+            <div
               className={`aloo-api-indicator ${isAnimating ? 'cycling' : ''} ${className}`}
               style={{ background: config.color }}
               onClick={() => setShowDetails(!showDetails)}
@@ -137,20 +137,20 @@ export default function DynamicAPIStatus({ activeTools, className = '' }: Dynami
                 <X size={12} />
               </Button>
             </div>
-            
+
             <div className="space-y-2">
               {activeTools.map((tool, index) => {
                 const toolConfig = toolConfigs[tool as keyof typeof toolConfigs]
                 if (!toolConfig) return null
-                
+
                 const ToolIcon = toolConfig.icon
                 return (
-                  <div 
+                  <div
                     key={tool}
                     className="flex items-center justify-between p-2 bg-aloo-accent/5 rounded-md"
                   >
                     <div className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="w-6 h-6 rounded-md flex items-center justify-center text-white"
                         style={{ background: toolConfig.color }}
                       >

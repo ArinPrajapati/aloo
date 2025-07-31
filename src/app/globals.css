@@ -11,6 +11,8 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
   --radius: 0.625rem;
+
+  /* AlooChat Design System - Light Mode */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -42,6 +44,54 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* AlooChat Custom Variables */
+  --aloo-background: #ffffff;
+  --aloo-sidebar-bg: #f8f9fa;
+  --aloo-accent: #FF6F61;
+  --aloo-accent-hover: #FF897D;
+  --aloo-text-primary: #1a1a1a;
+  --aloo-text-secondary: #6b7280;
+  --aloo-user-message: #4A90E2;
+  --aloo-bot-message: #f3f4f6;
+  --aloo-border: #e5e7eb;
+  --aloo-user-background: #ffffff;
+  --aloo-bot-background: #f7f7f8;
+}
+
+.dark {
+  /* AlooChat Design System - Dark Mode */
+  --background: #121212;
+  --foreground: #ffffff;
+  --card: #1a1a1a;
+  --card-foreground: #ffffff;
+  --popover: #1a1a1a;
+  --popover-foreground: #ffffff;
+  --primary: #FF6F61;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #ffffff;
+  --muted: #2a2a2a;
+  --muted-foreground: #b0b0b0;
+  --accent: #FF6F61;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #2a2a2a;
+  --input: #2a2a2a;
+  --ring: #FF6F61;
+
+  /* AlooChat Dark Mode Variables */
+  --aloo-background: #121212;
+  --aloo-sidebar-bg: #1E1E1E;
+  --aloo-accent: #FF6F61;
+  --aloo-accent-hover: #FF897D;
+  --aloo-text-primary: #ffffff;
+  --aloo-text-secondary: #b0b0b0;
+  --aloo-user-message: #4A90E2;
+  --aloo-bot-message: #2C2C2C;
+  --aloo-border: #2a2a2a;
+  --aloo-user-background: #121212;
+  --aloo-bot-background: #1e1e1e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,6 +100,389 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
+}
+
+/* AlooChat Design System Styles */
+.aloo-sidebar {
+  width: 240px;
+  background: var(--aloo-sidebar-bg);
+  border-right: 1px solid var(--aloo-border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.aloo-chat-header {
+  height: 60px;
+  background: var(--aloo-background);
+  border-bottom: 1px solid var(--aloo-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.aloo-api-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--aloo-accent);
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  animation: fadeInScale 0.3s ease-in-out;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aloo-api-indicator:hover {
+  background: var(--aloo-accent-hover);
+  transform: scale(1.05);
+}
+
+.aloo-api-indicator.cycling {
+  animation: cycleIndicator 0.5s ease-in-out;
+}
+
+.aloo-status-idle {
+  color: var(--aloo-text-secondary);
+  font-size: 12px;
+  padding: 6px 12px;
+  background: var(--aloo-accent)/10;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aloo-status-idle .status-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cycleIndicator {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* Old message styles - kept for backwards compatibility but can be removed */
+.aloo-message-user {
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  color: white;
+  margin-left: auto;
+  margin-right: 0;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+  max-width: 70%;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+.aloo-message-bot {
+  background: var(--aloo-bot-message);
+  color: var(--aloo-text-primary);
+  margin-right: auto;
+  margin-left: 0;
+  border-radius: 18px 18px 18px 4px;
+  border-left: 3px solid var(--aloo-accent);
+  padding: 10px 14px;
+  max-width: 70%;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Stream-like styling for ChatGPT-like design */
+.aloo-bot-background {
+  background: var(--aloo-bot-background);
+  transition: background-color 0.2s ease;
+}
+
+.aloo-user-background {
+  background: var(--aloo-user-background);
+  transition: background-color 0.2s ease;
+}
+
+/* Enhanced message styling */
+.aloo-message-content {
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.aloo-message-content p {
+  margin-bottom: 0.75em;
+}
+
+.aloo-message-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Code block improvements */
+.aloo-message-content pre {
+  background: var(--aloo-background) !important;
+  border: 1px solid var(--aloo-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+.aloo-message-content code {
+  background: var(--aloo-sidebar-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.aloo-input-area {
+  height: 60px;
+  background: var(--aloo-sidebar-bg);
+  border-top: 1px solid var(--aloo-border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aloo-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--aloo-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.aloo-new-chat-btn {
+  width: 100%;
+  background: var(--aloo-accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.aloo-new-chat-btn:hover {
+  background: var(--aloo-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
+}
+
+.aloo-conversation-item {
+  padding: 16px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+}
+
+.aloo-conversation-item:hover {
+  background: var(--aloo-accent);
+  color: white;
+  transform: translateX(4px);
+}
+
+.aloo-conversation-item.active {
+  background: var(--aloo-accent);
+  color: white;
+  border-left: 4px solid var(--aloo-accent-hover);
+}
+
+.aloo-api-status {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--aloo-border);
+}
+
+.aloo-api-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.aloo-api-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 111, 97, 0.3);
+}
+
+.aloo-api-icon.active {
+  background: var(--aloo-accent);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+.aloo-api-icon.active::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--aloo-background);
+}
+
+.aloo-send-btn {
+  background: var(--aloo-accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.aloo-send-btn:hover {
+  background: var(--aloo-accent-hover);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 111, 97, 0.4);
+}
+
+.aloo-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 111, 97, 0.7);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 111, 97, 0);
+  }
+}
+
+.aloo-tooltip {
+  background: var(--aloo-background);
+  color: var(--aloo-text-primary);
+  border: 1px solid var(--aloo-border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.aloo-mobile-menu {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .aloo-sidebar {
+    position: fixed;
+    left: -240px;
+    z-index: 50;
+    transition: left 0.3s ease;
+  }
+
+  .aloo-sidebar.open {
+    left: 0;
+  }
+
+  .aloo-mobile-menu {
+    display: block;
+  }
+
+  .aloo-message-user,
+  .aloo-message-bot {
+    max-width: 85%;
+  }
+
+  .aloo-api-indicator {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .aloo-status-idle {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .aloo-sidebar {
+    width: 64px;
+    padding: 16px 8px;
+  }
+
+  .aloo-brand span {
+    display: none;
+  }
+
+  .aloo-conversation-item span {
+    display: none;
+  }
+}
+
+/* Custom scrollbar for AlooChat */
+.aloo-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aloo-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aloo-scroll::-webkit-scrollbar-thumb {
+  background: var(--aloo-accent);
+  border-radius: 3px;
+  opacity: 0.6;
+}
+
+.aloo-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--aloo-accent-hover);
+  opacity: 1;
 }
 
 /* Custom scrollbar */
@@ -156,6 +589,7 @@
 
 /* Animation for typing indicator */
 @keyframes bounce {
+
   0%,
   80%,
   100% {
@@ -247,6 +681,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

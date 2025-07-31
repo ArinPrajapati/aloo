@@ -30,6 +30,7 @@ export default function Home() {
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [activeTools, setActiveTools] = useState<string[]>([])
   const chatEndRef = useRef<HTMLDivElement | null>(null)
   const { theme, toggleTheme } = useTheme()
 
@@ -51,8 +52,39 @@ export default function Home() {
 
   const activeChat = chats.find((c) => c.id === activeChatId)
 
+  const detectActiveTools = (message: string): string[] => {
+    const tools: string[] = []
+    const lowerMessage = message.toLowerCase()
+
+    // Weather detection
+    if (lowerMessage.includes('weather') || lowerMessage.includes('temperature') || lowerMessage.includes('forecast')) {
+      tools.push('weather')
+    }
+
+    // GitHub detection
+    if (lowerMessage.includes('github') || lowerMessage.includes('repository') || lowerMessage.includes('repo')) {
+      tools.push('github')
+    }
+
+    // Wikipedia detection
+    if (lowerMessage.match(/^(what is|who is|who was|explain|tell me about|define)/i)) {
+      tools.push('wikipedia')
+    }
+
+    // Giphy detection
+    if (lowerMessage.includes('gif') || lowerMessage.includes('meme') || lowerMessage.includes('funny')) {
+      tools.push('giphy')
+    }
+
+    return tools
+  }
+
   const sendMessage = async () => {
     if (!input.trim() || !activeChat) return
+
+    // Detect and set active tools
+    const detectedTools = detectActiveTools(input)
+    setActiveTools(detectedTools)
 
     // Add user message to database
     await addMessage(activeChat.id, 'User', input)
@@ -84,9 +116,13 @@ export default function Home() {
 
       // Add bot response to database
       await addMessage(activeChat.id, 'Bot', data.reply, data.toolOutput)
+
+      // Clear active tools after response
+      setTimeout(() => setActiveTools([]), 2000)
     } catch (error) {
       // Add error message to database
       await addMessage(activeChat.id, 'Bot', 'Sorry, I encountered an error. Please try again.')
+      setActiveTools([])
     }
 
     setLoading(false)
@@ -122,12 +158,12 @@ export default function Home() {
   // Handle authentication loading
   if (!isLoaded || chatsLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
+      <div className="flex h-screen items-center justify-center" style={{ background: 'var(--aloo-background)' }}>
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <div className="w-8 h-8 bg-white rounded-full"></div>
+            🥔
           </div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p style={{ color: 'var(--aloo-text-secondary)' }}>Loading AlooChat...</p>
         </div>
       </div>
     )
@@ -139,7 +175,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen" style={{ background: 'var(--aloo-background)' }}>
       <ChatSidebar
         chats={chats}
         activeChatId={activeChatId}
@@ -151,7 +187,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {activeChat ? (
           <>
-            <ChatHeader chat={activeChat} />
+            <ChatHeader chat={activeChat} activeTools={activeTools} />
             <MessageList
               ref={chatEndRef}
               messages={activeChat.messages}

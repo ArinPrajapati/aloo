@@ -1,17 +1,17 @@
-import { 
-  Github, 
-  Cloud, 
-  BookOpen, 
+import {
+  Github,
+  Cloud,
+  BookOpen,
   Image,
   Activity,
   Wifi,
-  WifiOff 
+  WifiOff
 } from 'lucide-react'
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
 } from './ui/tooltip'
 
 interface APIStatusProps {
@@ -59,16 +59,16 @@ export default function APIStatus({ activeTools, className = '' }: APIStatusProp
             <span className="text-xs text-green-500">Online</span>
           </div>
         </div>
-        
+
         <div className="flex gap-2 flex-wrap">
           {Object.entries(toolConfigs).map(([key, config]) => {
             const IconComponent = config.icon
             const isActive = activeTools.includes(key)
-            
+
             return (
               <Tooltip key={key}>
                 <TooltipTrigger asChild>
-                  <div 
+                  <div
                     className={`aloo-api-icon ${isActive ? 'active' : ''}`}
                     style={{
                       backgroundColor: isActive ? config.color : 'transparent',
@@ -93,7 +93,7 @@ export default function APIStatus({ activeTools, className = '' }: APIStatusProp
             )
           })}
         </div>
-        
+
         {/* Quick Actions */}
         <div className="mt-4 pt-3 border-t border-aloo-border">
           <div className="text-xs text-aloo-text-secondary mb-2">Quick Actions</div>
