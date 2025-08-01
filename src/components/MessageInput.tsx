@@ -3,6 +3,7 @@ import { Send, Paperclip, Mic, Sparkles } from 'lucide-react'
 import { useTheme } from '../context/theme-context'
 import { Button } from './ui/button'
 import { Textarea } from './ui/textarea'
+import { memo, useCallback } from 'react'
 import {
   Tooltip,
   TooltipContent,
@@ -18,7 +19,7 @@ interface MessageInputProps {
   onKeyPress: (e: React.KeyboardEvent) => void
 }
 
-export default function MessageInput({
+const MessageInput = memo(function MessageInput({
   input,
   loading,
   onInputChange,
@@ -26,6 +27,15 @@ export default function MessageInput({
   onKeyPress,
 }: MessageInputProps) {
   const { theme } = useTheme()
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onInputChange(e.target.value)
+  }, [onInputChange])
+
+  const handleSendClick = useCallback(() => {
+    if (!input.trim() || loading) return
+    onSendMessage()
+  }, [input, loading, onSendMessage])
 
   return (
     <TooltipProvider>
@@ -50,12 +60,16 @@ export default function MessageInput({
           {/* Input Area */}
           <div className="relative flex-1">
             <Textarea
-              className="min-h-10 max-h-32 resize-none pr-16 shadow-sm border-aloo-border focus:border-aloo-accent focus:ring-aloo-accent/20 bg-aloo-background text-aloo-text-primary placeholder:text-aloo-text-secondary"
+              className="min-h-10 max-h-32 resize-none pr-16 shadow-sm border-aloo-border focus:border-aloo-accent focus:ring-aloo-accent/20 bg-aloo-background text-aloo-text-primary placeholder:text-aloo-text-secondary transition-colors duration-150"
               value={input}
-              onChange={(e) => onInputChange(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={onKeyPress}
               placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
               disabled={loading}
+              style={{
+                transform: 'translateZ(0)',
+                willChange: 'scroll-position'
+              }}
             />
             <div className="absolute right-2 bottom-2 flex gap-1">
               <Tooltip>
@@ -77,7 +91,7 @@ export default function MessageInput({
 
           {/* Send Button */}
           <Button
-            onClick={onSendMessage}
+            onClick={handleSendClick}
             disabled={!input.trim() || loading}
             className="aloo-send-btn h-10 w-10"
           >
@@ -115,4 +129,6 @@ export default function MessageInput({
       </div>
     </TooltipProvider>
   )
-}
+})
+
+export default MessageInput

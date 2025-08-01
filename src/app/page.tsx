@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
@@ -52,7 +52,7 @@ export default function Home() {
 
   const activeChat = chats.find((c) => c.id === activeChatId)
 
-  const detectActiveTools = (message: string): string[] => {
+  const detectActiveTools = useCallback((message: string): string[] => {
     const tools: string[] = []
     const lowerMessage = message.toLowerCase()
 
@@ -77,9 +77,9 @@ export default function Home() {
     }
 
     return tools
-  }
+  }, [])
 
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
     if (!input.trim() || !activeChat) return
 
     // Detect and set active tools
@@ -126,16 +126,16 @@ export default function Home() {
     }
 
     setLoading(false)
-  }
+  }, [input, activeChat, detectActiveTools, addMessage, updateChatTitle])
 
-  const createNewChat = async () => {
+  const createNewChat = useCallback(async () => {
     const newChat = await createChat('New Chat')
     if (newChat) {
       setActiveChatId(newChat.id)
     }
-  }
+  }, [createChat])
 
-  const handleDeleteChat = async (id: string) => {
+  const handleDeleteChat = useCallback(async (id: string) => {
     await deleteChatFromDB(id)
 
     if (activeChatId === id) {
@@ -146,14 +146,18 @@ export default function Home() {
         setActiveChatId(null)
       }
     }
-  }
+  }, [deleteChatFromDB, activeChatId, chats])
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleInputChange = useCallback((value: string) => {
+    setInput(value)
+  }, [])
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage()
     }
-  }
+  }, [sendMessage])
 
   // Handle authentication loading
   if (!isLoaded || chatsLoading) {
@@ -196,7 +200,7 @@ export default function Home() {
             <MessageInput
               input={input}
               loading={loading}
-              onInputChange={setInput}
+              onInputChange={handleInputChange}
               onSendMessage={sendMessage}
               onKeyPress={handleKeyPress}
             />
