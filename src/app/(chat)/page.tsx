@@ -4,46 +4,38 @@ import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
 
-import { useTheme } from '../context/theme-context'
-import type { Chat, ChatMessage } from '../type'
-import { useChats } from '../hooks/useChats'
+import { useTheme } from '../../context/aloo-theme-context'
+import type { ChatMessage } from '../../type'
+import { useChatContext } from './layout'
 
 import {
-  ChatSidebar,
   ChatHeader,
   MessageList,
   MessageInput,
   WelcomeScreen,
-} from '../components'
+} from '../../components'
 
-export default function Home() {
+export default function ChatPage() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
-  const {
-    chats,
+  const { 
+    chats, 
+    activeChatId, 
     loading: chatsLoading,
-    createChat,
+    createNewChat,
     addMessage,
-    updateChatTitle,
-    deleteChat: deleteChatFromDB
-  } = useChats()
-  const [activeChatId, setActiveChatId] = useState<string | null>(null)
+    updateChatTitle
+  } = useChatContext()
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const chatEndRef = useRef<HTMLDivElement | null>(null)
-  const { theme, toggleTheme } = useTheme()
+  const { theme } = useTheme()
 
   useEffect(() => {
     if (isLoaded && !user) {
       router.push('/auth/login')
     }
   }, [user, isLoaded, router])
-
-  useEffect(() => {
-    if (chats.length > 0 && !activeChatId) {
-      setActiveChatId(chats[0].id)
-    }
-  }, [chats, activeChatId])
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -92,26 +84,6 @@ export default function Home() {
     setLoading(false)
   }, [input, activeChat, addMessage, updateChatTitle])
 
-  const createNewChat = useCallback(async () => {
-    const newChat = await createChat('New Chat')
-    if (newChat) {
-      setActiveChatId(newChat.id)
-    }
-  }, [createChat])
-
-  const handleDeleteChat = useCallback(async (id: string) => {
-    await deleteChatFromDB(id)
-
-    if (activeChatId === id) {
-      if (chats.length > 1) {
-        const remainingChats = chats.filter(chat => chat.id !== id)
-        setActiveChatId(remainingChats[0]?.id || null)
-      } else {
-        setActiveChatId(null)
-      }
-    }
-  }, [deleteChatFromDB, activeChatId, chats])
-
   const handleInputChange = useCallback((value: string) => {
     setInput(value)
   }, [])
@@ -143,36 +115,26 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen" style={{ background: 'var(--aloo-background)' }}>
-      <ChatSidebar
-        chats={chats}
-        activeChatId={activeChatId}
-        onNewChat={createNewChat}
-        onSelectChat={setActiveChatId}
-        onDeleteChat={handleDeleteChat}
-      />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {activeChat ? (
-          <>
-            <ChatHeader chat={activeChat} />
-            <MessageList
-              ref={chatEndRef}
-              messages={activeChat.messages}
-              loading={loading}
-            />
-            <MessageInput
-              input={input}
-              loading={loading}
-              onInputChange={handleInputChange}
-              onSendMessage={sendMessage}
-              onKeyDown={handleKeyPress}
-            />
-          </>
-        ) : (
-          <WelcomeScreen onNewChat={createNewChat} />
-        )}
-      </div>
+    <div className="flex flex-col h-full overflow-hidden">
+      {activeChat ? (
+        <>
+          <ChatHeader chat={activeChat} />
+          <MessageList
+            ref={chatEndRef}
+            messages={activeChat.messages}
+            loading={loading}
+          />
+          <MessageInput
+            input={input}
+            loading={loading}
+            onInputChange={handleInputChange}
+            onSendMessage={sendMessage}
+            onKeyDown={handleKeyPress}
+          />
+        </>
+      ) : (
+        <WelcomeScreen onNewChat={createNewChat} />
+      )}
     </div>
   )
 }

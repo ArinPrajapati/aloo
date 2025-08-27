@@ -27,7 +27,7 @@ export const webclientTool: Tool = {
     body: 'Request body for POST/PUT requests',
     timeout: 'Request timeout in milliseconds'
   },
-  
+
   async execute(params: WebClientParams): Promise<ApiResponse> {
     const {
       method = 'GET',
@@ -99,7 +99,7 @@ export const webclientTool: Tool = {
       // Parse response data
       let data: any
       const contentType = response.headers.get('content-type') || ''
-      
+
       try {
         if (contentType.includes('application/json')) {
           data = await response.json()
@@ -124,7 +124,7 @@ export const webclientTool: Tool = {
 
     } catch (error) {
       const responseTime = Date.now() - startTime
-      
+
       if (error instanceof Error) {
         if (error.name === 'AbortError' || error.message.includes('timeout')) {
           return {
@@ -136,7 +136,7 @@ export const webclientTool: Tool = {
             error: `Request timed out after ${timeout}ms`
           }
         }
-        
+
         if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
           return {
             status: 0,
@@ -202,11 +202,11 @@ export function parseApiRequest(input: string): WebClientParams | null {
 function parseStructuredRequest(content: string): WebClientParams | null {
   try {
     const lines = content.trim().split('\n').map(line => line.trim())
-    
+
     // First line should be METHOD URL
     const firstLine = lines[0]
     const methodUrlMatch = firstLine.match(/^(GET|POST|PUT|DELETE|PATCH)\s+(https?:\/\/[^\s]+)/i)
-    
+
     if (!methodUrlMatch) {
       return null
     }
@@ -222,12 +222,12 @@ function parseStructuredRequest(content: string): WebClientParams | null {
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i]
-      
+
       if (line.toLowerCase().startsWith('headers:')) {
         currentSection = 'headers'
         continue
       }
-      
+
       if (line.toLowerCase().startsWith('body:')) {
         currentSection = 'body'
         continue
@@ -271,7 +271,7 @@ export function analyzeApiResponse(response: ApiResponse): string {
   // Status analysis
   if (error) {
     analysis += `❌ **Error**: ${error}\n\n`
-    
+
     if (status === 0) {
       analysis += `**Troubleshooting Tips:**\n`
       analysis += `• Check if the URL is correct and the server is running\n`
@@ -297,7 +297,7 @@ export function analyzeApiResponse(response: ApiResponse): string {
   } else {
     analysis += `✅ **Status**: ${status} ${statusText}\n`
     analysis += `⏱️ **Response Time**: ${responseTime}ms\n\n`
-    
+
     // Data analysis
     if (data) {
       if (Array.isArray(data)) {

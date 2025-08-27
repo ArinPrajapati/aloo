@@ -77,8 +77,8 @@ export default function WebclientCard({ data }: WebclientCardProps) {
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Response Data</div>
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-3 overflow-x-auto border dark:border-gray-700">
               <pre className="text-xs text-gray-800 dark:text-gray-200">
-                {typeof responseData === 'string' 
-                  ? responseData.length > 500 
+                {typeof responseData === 'string'
+                  ? responseData.length > 500
                     ? responseData.substring(0, 500) + '...\n\n[Truncated - showing first 500 characters]'
                     : responseData
                   : JSON.stringify(responseData, null, 2)}

@@ -1,5 +1,5 @@
 import { Bot, MessageSquare, Sparkles, Zap } from 'lucide-react'
-import { useTheme } from '../context/theme-context'
+import { useTheme } from '../context/aloo-theme-context'
 import { Button } from './ui/button'
 import {
   Card,

@@ -27,9 +27,9 @@ export default function DynamicAPIStatus() {
   const Icon = currentTool.icon
 
   return (
-        <div className="flex items-center gap-2 text-xs text-aloo-text-secondary">
-      <Icon 
-        size={14} 
+    <div className="flex items-center gap-2 text-xs text-aloo-text-secondary">
+      <Icon
+        size={14}
         style={{ color: currentTool.color }}
         className="transition-all duration-700 ease-in-out transform"
       />

@@ -1,7 +1,7 @@
 'use client'
 import { Sun, Moon, Plus, Trash2, MessageCircle, Bot, LogOut, User, Menu } from 'lucide-react'
 import { useUser, useClerk } from '@clerk/nextjs'
-import { useTheme } from '../context/theme-context'
+import { useTheme } from '../context/aloo-theme-context'
 import type { Chat } from '../type'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
