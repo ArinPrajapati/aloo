@@ -3,12 +3,14 @@ import { getWeatherTool } from './tools/weatherTool'
 import { getGitHubTool } from './tools/githubTool'
 import { getGiphyTool } from './tools/giphyTool'
 import { getWikipediaTool } from './tools/wikipediaTool'
+import { webclientTool } from './tools/webclientTool'
 
 export const tools: Record<string, Tool> = {
   weather: getWeatherTool(),
   github: getGitHubTool(),
   giphy: getGiphyTool(),
   wikipedia: getWikipediaTool(),
+  webclient: webclientTool,
 }
 
 export function getToolDescriptions(): string {

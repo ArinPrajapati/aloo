@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import type React from 'react'
@@ -30,7 +30,6 @@ export default function Home() {
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [activeTools, setActiveTools] = useState<string[]>([])
   const chatEndRef = useRef<HTMLDivElement | null>(null)
   const { theme, toggleTheme } = useTheme()
 
@@ -52,39 +51,8 @@ export default function Home() {
 
   const activeChat = chats.find((c) => c.id === activeChatId)
 
-  const detectActiveTools = useCallback((message: string): string[] => {
-    const tools: string[] = []
-    const lowerMessage = message.toLowerCase()
-
-    // Weather detection
-    if (lowerMessage.includes('weather') || lowerMessage.includes('temperature') || lowerMessage.includes('forecast')) {
-      tools.push('weather')
-    }
-
-    // GitHub detection
-    if (lowerMessage.includes('github') || lowerMessage.includes('repository') || lowerMessage.includes('repo')) {
-      tools.push('github')
-    }
-
-    // Wikipedia detection
-    if (lowerMessage.match(/^(what is|who is|who was|explain|tell me about|define)/i)) {
-      tools.push('wikipedia')
-    }
-
-    // Giphy detection
-    if (lowerMessage.includes('gif') || lowerMessage.includes('meme') || lowerMessage.includes('funny')) {
-      tools.push('giphy')
-    }
-
-    return tools
-  }, [])
-
   const sendMessage = useCallback(async () => {
     if (!input.trim() || !activeChat) return
-
-    // Detect and set active tools
-    const detectedTools = detectActiveTools(input)
-    setActiveTools(detectedTools)
 
     // Add user message to database
     await addMessage(activeChat.id, 'User', input)
@@ -116,17 +84,13 @@ export default function Home() {
 
       // Add bot response to database
       await addMessage(activeChat.id, 'Bot', data.reply, data.toolOutput)
-
-      // Clear active tools after response
-      setTimeout(() => setActiveTools([]), 2000)
     } catch (error) {
       // Add error message to database
       await addMessage(activeChat.id, 'Bot', 'Sorry, I encountered an error. Please try again.')
-      setActiveTools([])
     }
 
     setLoading(false)
-  }, [input, activeChat, detectActiveTools, addMessage, updateChatTitle])
+  }, [input, activeChat, addMessage, updateChatTitle])
 
   const createNewChat = useCallback(async () => {
     const newChat = await createChat('New Chat')
@@ -191,7 +155,7 @@ export default function Home() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {activeChat ? (
           <>
-            <ChatHeader chat={activeChat} activeTools={activeTools} />
+            <ChatHeader chat={activeChat} />
             <MessageList
               ref={chatEndRef}
               messages={activeChat.messages}
@@ -202,7 +166,7 @@ export default function Home() {
               loading={loading}
               onInputChange={handleInputChange}
               onSendMessage={sendMessage}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
             />
           </>
         ) : (

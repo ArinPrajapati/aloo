@@ -16,7 +16,7 @@ interface MessageInputProps {
   loading: boolean
   onInputChange: (value: string) => void
   onSendMessage: () => void
-  onKeyPress: (e: React.KeyboardEvent) => void
+  onKeyDown: (e: React.KeyboardEvent) => void
 }
 
 const MessageInput = memo(function MessageInput({
@@ -24,7 +24,7 @@ const MessageInput = memo(function MessageInput({
   loading,
   onInputChange,
   onSendMessage,
-  onKeyPress,
+  onKeyDown,
 }: MessageInputProps) {
   const { theme } = useTheme()
 
@@ -60,16 +60,16 @@ const MessageInput = memo(function MessageInput({
           {/* Input Area */}
           <div className="relative flex-1">
             <Textarea
-              className="min-h-10 max-h-32 resize-none pr-16 shadow-sm border-aloo-border focus:border-aloo-accent focus:ring-aloo-accent/20 bg-aloo-background text-aloo-text-primary placeholder:text-aloo-text-secondary transition-colors duration-150"
+              className="min-h-10 max-h-32 resize-none pr-16 shadow-sm border-aloo-border focus:border-aloo-accent focus:ring-aloo-accent/20 bg-aloo-background text-aloo-text-primary placeholder:text-aloo-text-secondary transition-none"
               value={input}
               onChange={handleInputChange}
-              onKeyPress={onKeyPress}
+              onKeyDown={onKeyDown}
               placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
               disabled={loading}
-              style={{
-                transform: 'translateZ(0)',
-                willChange: 'scroll-position'
-              }}
+              rows={1}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck="false"
             />
             <div className="absolute right-2 bottom-2 flex gap-1">
               <Tooltip>

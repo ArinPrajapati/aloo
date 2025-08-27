@@ -34,6 +34,13 @@ IMPORTANT: For Wikipedia tool, look for these patterns:
 - Educational/factual questions about: people, places, concepts, history, science, etc.
 - Examples: "What is machine learning?", "Who is Einstein?", "Tell me about Paris", "Explain quantum physics"
 
+IMPORTANT: For Webclient tool, look for these patterns:
+- API testing requests with URLs: "GET https://api.example.com/users", "POST https://api.example.com/login"
+- Structured API requests starting with "webclient:"
+- Direct URL testing: "Test this API: https://example.com/api/data"
+- API debugging requests: "Call this endpoint", "Make a request to", "Test API"
+- Examples: "GET https://jsonplaceholder.typicode.com/posts", "webclient: POST https://api.example.com/users"
+
 Conversation history:
 ${history.map((h) => `${h.role}: ${h.text}`).join('\n')}
 
@@ -50,6 +57,7 @@ Examples:
 - For GitHub: {"tool": "github", "params": {"query": "react", "type": "search"}}
 - For Wikipedia: {"tool": "wikipedia", "params": {"query": "machine learning"}}
 - For Giphy: {"tool": "giphy", "params": {"query": "funny cats", "type": "gif"}}
+- For Webclient: {"tool": "webclient", "params": {"method": "GET", "url": "https://api.example.com/users"}}
 - For general chat: {"tool": null, "params": {}}
 
 JSON Response:`

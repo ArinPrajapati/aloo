@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { WeatherCard, GitHubCard, GiphyCard, WikipediaCard } from './tools'
+import { WeatherCard, GitHubCard, GiphyCard, WikipediaCard, WebclientCard } from './tools'
 
 interface ToolOutputProps {
   toolOutput: any
@@ -27,6 +27,16 @@ export default function ToolOutput({ toolOutput, toolName }: ToolOutputProps) {
   // Wikipedia tool detection
   if (toolName === 'wikipedia' || toolOutput.title || toolOutput.summary || toolOutput.error) {
     return <WikipediaCard data={toolOutput} />
+  }
+
+  // Webclient tool detection
+  if (toolName === 'webclient' || toolOutput.status !== undefined || toolOutput.responseTime !== undefined) {
+    return <WebclientCard data={toolOutput} />
+  }
+
+  // Webclient tool detection
+  if (toolName === 'webclient' || toolOutput.status !== undefined || toolOutput.responseTime !== undefined) {
+    return <WebclientCard data={toolOutput} />
   }
 
   // Generic JSON display for unknown tool outputs

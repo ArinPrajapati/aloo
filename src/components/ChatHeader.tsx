@@ -13,10 +13,9 @@ import DynamicAPIStatus from './DynamicAPIStatus'
 
 interface ChatHeaderProps {
   chat: Chat
-  activeTools?: string[]
 }
 
-export default function ChatHeader({ chat, activeTools = [] }: ChatHeaderProps) {
+export default function ChatHeader({ chat }: ChatHeaderProps) {
   const { theme } = useTheme()
 
   return (
@@ -49,7 +48,7 @@ export default function ChatHeader({ chat, activeTools = [] }: ChatHeaderProps) 
 
         <div className="flex items-center space-x-3">
           {/* Dynamic API Status - Main Feature */}
-          <DynamicAPIStatus activeTools={activeTools} />
+          <DynamicAPIStatus />
 
           <div className="flex items-center space-x-1">
             <Tooltip>

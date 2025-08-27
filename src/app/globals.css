@@ -269,6 +269,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  will-change: contents;
+}
+
+/* Optimize textarea performance */
+.aloo-input-area textarea {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Input performance optimizations */
